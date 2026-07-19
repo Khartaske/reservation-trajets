@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" font-family="Segoe UI, sans-serif">
+  <rect x="0" y="0" width="800" height="560" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+  <rect x="0" y="0" width="800" height="52" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+  <text x="24" y="33" font-size="18" font-weight="bold" fill="#111111">RésaTrajets</text>
+  <text x="500" y="33" font-size="14" fill="#111111">Rechercher</text>
+  <text x="600" y="33" font-size="14" fill="#111111">Mes réservations</text>
+  <rect x="716" y="12" width="70" height="28" fill="none" stroke="#111111"/>
+  <text x="726" y="31" font-size="13" fill="#111111">Connexion</text>
+  <rect x="150" y="84" width="500" height="440" fill="none" stroke="#111111" stroke-width="2"/>
+  <text x="180" y="126" font-size="24" font-weight="bold" fill="#111111">Paris → Lyon</text>
+  <line x1="180" y1="150" x2="620" y2="150" stroke="#111111"/>
+  <text x="180" y="180" font-size="13" fill="#555555">Départ</text>
+  <text x="420" y="180" font-size="13" fill="#111111">samedi 25 juillet 2026 à 08:15</text>
+  <line x1="180" y1="194" x2="620" y2="194" stroke="#cccccc"/>
+  <text x="180" y="222" font-size="13" fill="#555555">Arrivée</text>
+  <text x="420" y="222" font-size="13" fill="#111111">samedi 25 juillet 2026 à 10:10</text>
+  <line x1="180" y1="236" x2="620" y2="236" stroke="#cccccc"/>
+  <text x="180" y="264" font-size="13" fill="#555555">Durée</text>
+  <text x="420" y="264" font-size="13" fill="#111111">1 h 55</text>
+  <line x1="180" y1="278" x2="620" y2="278" stroke="#cccccc"/>
+  <text x="180" y="306" font-size="13" fill="#555555">Prix par place</text>
+  <text x="420" y="306" font-size="13" fill="#111111">45,00 €</text>
+  <line x1="180" y1="320" x2="620" y2="320" stroke="#cccccc"/>
+  <text x="180" y="348" font-size="13" fill="#555555">Places restantes</text>
+  <text x="420" y="348" font-size="13" font-weight="bold" fill="#111111">50</text>
+  <rect x="180" y="376" width="440" height="86" fill="none" stroke="#555555" stroke-dasharray="6,5"/>
+  <text x="196" y="402" font-size="12" fill="#555555">Nombre de places</text>
+  <rect x="196" y="410" width="70" height="32" fill="none" stroke="#555555"/>
+  <text x="224" y="431" font-size="13" fill="#111111">2</text>
+  <text x="296" y="431" font-size="13" fill="#111111">Prix total : 90,00 €</text>
+  <rect x="470" y="408" width="130" height="36" fill="#111111"/>
+  <text x="506" y="431" font-size="14" fill="#ffffff">Réserver</text>
+  <rect x="180" y="478" width="440" height="30" fill="none" stroke="#555555" stroke-dasharray="3,3"/>
+  <text x="196" y="498" font-size="11" fill="#555555">Zone de message : succès de réservation ou erreur 409 « plus assez de places »</text>
+  <text x="24" y="545" font-size="11" fill="#888888">Écran 3 — Détail du trajet · GET /api/trips/&lt;id&gt; puis POST /api/bookings (redirige vers Connexion si déconnecté)</text>
+</svg>

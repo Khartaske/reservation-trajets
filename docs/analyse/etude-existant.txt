@@ -1,0 +1,84 @@
+Étude de l'existant — plateformes de réservation de trajets
+============================================================
+
+Trois plateformes grand public ont été parcourues de bout en bout
+(recherche -> réservation -> gestion du compte -> annulation) afin d'en
+extraire les patrons d'interface et de parcours à retenir pour le projet.
+
+Grille comparative
+------------------
+
+Type d'offre
+    BlaBlaCar ....... Covoiturage + bus
+    SNCF Connect .... Trains (TGV, TER, Intercités)
+    FlixBus ......... Bus longue distance
+
+Recherche
+    BlaBlaCar ....... Formulaire 3 champs : départ, arrivée, date
+                      (+ nombre de passagers), avec autocomplétion des
+                      villes
+    SNCF Connect .... Champs origine/destination avec gares, calendrier
+                      des prix par jour
+    FlixBus ......... Formulaire départ / arrivée / date, aller simple ou
+                      aller-retour
+
+Résultats
+    BlaBlaCar ....... Liste verticale de cartes : heures, durée, prix,
+                      places restantes, profil du conducteur
+    SNCF Connect .... Liste par horaires avec classes et gammes
+                      tarifaires, filtres (direct, durée)
+    FlixBus ......... Cartes par départ : heures, durée, prix, badge
+                      « complet » ou « dernières places »
+
+Détail
+    BlaBlaCar ....... Page trajet : points de rendez-vous, préférences du
+                      conducteur, avis
+    SNCF Connect .... Détail du train : arrêts, services à bord,
+                      conditions du tarif
+    FlixBus ......... Détail : arrêts desservis, équipements (wifi,
+                      prises), bagages
+
+Réservation
+    BlaBlaCar ....... Compte obligatoire, paiement en ligne, nombre de
+                      places limité par l'offre
+    SNCF Connect .... Compte ou invité, choix du tarif puis paiement
+    FlixBus ......... Nombre de passagers, sièges précis en option
+                      payante, paiement
+
+Compte / réservations
+    BlaBlaCar ....... « Vos trajets » : à venir et passés, statut de
+                      chaque réservation
+    SNCF Connect .... « Mes billets » : billets à venir, échanges
+    FlixBus ......... Compte facultatif (référence + email), liste des
+                      commandes
+
+Annulation
+    BlaBlaCar ....... En ligne, conditions selon le délai avant le départ
+    SNCF Connect .... Échange/annulation selon le tarif choisi
+    FlixBus ......... Annulation en avoir, selon conditions
+
+État « complet »
+    BlaBlaCar ....... Trajet affiché non réservable
+    SNCF Connect .... Train affiché « complet » ou tarif épuisé
+    FlixBus ......... Badge « complet », carte non cliquable
+
+Enseignements retenus pour le projet
+------------------------------------
+
+1. Le formulaire de recherche à 3 champs est le standard absolu
+   (départ, arrivée, date) : c'est l'écran d'accueil, sans distraction.
+2. La carte de résultat porte toujours les mêmes informations :
+   origine -> destination, date/heure, prix, disponibilité, bouton
+   d'action. Elle sera le composant réutilisable du frontend.
+3. La disponibilité est centrale : les trois plateformes affichent les
+   places restantes ou un état « complet ». Le projet calculera cette
+   valeur côté serveur, jamais côté client.
+4. Le compte n'est exigé qu'au moment de réserver : la recherche et la
+   consultation restent libres — le projet adoptera la même logique
+   (redirection vers la connexion au moment de l'action).
+5. « Mes réservations » avec statut (confirmée / annulée) et action
+   d'annulation avec confirmation : présent partout, repris tel quel.
+6. Simplifications assumées par rapport à l'existant : pas de
+   paiement réel, pas de choix de siège, pas d'avis, pas
+   d'autocomplétion des villes en v1 — voir le périmètre gelé dans
+   user-stories.txt.

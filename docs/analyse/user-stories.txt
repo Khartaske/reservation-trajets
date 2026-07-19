@@ -1,0 +1,93 @@
+Cahier des charges — user stories priorisées (MoSCoW)
+=====================================================
+
+Un seul acteur : le voyageur. Le périmètre v1 ci-dessous est gelé ;
+toute idée nouvelle rejoint la liste « si j'ai le temps » et n'entre pas
+dans la v1.
+
+Must have — le cœur du produit
+------------------------------
+
+US1 — En tant que voyageur, je recherche un trajet par ville de départ,
+ville d'arrivée et date afin de trouver un départ qui me convient.
+    Critères d'acceptation : les trois critères sont optionnels et
+    combinables ; seuls les trajets futurs apparaissent, triés par date
+    de départ.
+
+US2 — En tant que voyageur, je consulte la liste des trajets avec le prix
+et les places restantes afin de comparer les offres.
+    Critères d'acceptation : chaque carte affiche origine -> destination,
+    date/heure, prix, places restantes ; un état « aucun trajet trouvé »
+    est prévu.
+
+US3 — En tant que voyageur, je consulte le détail d'un trajet afin de
+vérifier toutes ses informations avant de réserver.
+    Critères d'acceptation : horaires, durée, prix par place, capacité et
+    places restantes ; erreur claire si le trajet n'existe pas.
+
+US4 — En tant que visiteur, je crée un compte avec mon nom, mon email et
+un mot de passe afin de pouvoir réserver.
+    Critères d'acceptation : email unique (erreur 409 sinon), mot de
+    passe stocké haché, messages d'erreur sous les champs.
+
+US5 — En tant que voyageur, je me connecte avec mon email et mon mot de
+passe afin de retrouver mes réservations.
+    Critères d'acceptation : identifiants invalides -> message clair
+    (401) ; la session survit au rechargement de la page.
+
+US6 — En tant que voyageur connecté, je réserve un nombre de places sur
+un trajet afin de garantir mon départ.
+    Critères d'acceptation : le serveur recalcule la disponibilité et
+    refuse avec un message clair (409) si les places demandées dépassent
+    les places restantes.
+
+US7 — En tant que voyageur connecté, je consulte « Mes réservations »
+afin de suivre mes trajets à venir et passés.
+    Critères d'acceptation : uniquement les réservations du compte
+    connecté, avec trajet, nombre de places, prix total et statut.
+
+US8 — En tant que voyageur connecté, j'annule une réservation afin de
+libérer les places que je n'utiliserai pas.
+    Critères d'acceptation : confirmation demandée ; le statut passe à
+    « annulée » et les places redeviennent immédiatement disponibles à
+    la recherche.
+
+Should have
+-----------
+
+US9 — En tant que visiteur, je vois les prochains départs dès la page
+d'accueil afin de découvrir l'offre sans effort.
+    Critères d'acceptation : la liste s'affiche sous le formulaire, sans
+    filtre : la page n'est jamais vide.
+
+US10 — En tant que voyageur, je suis redirigé vers la connexion quand une
+action l'exige, puis ramené à la page demandée.
+    Critères d'acceptation : cliquer « Réserver » sans session mène à la
+    connexion ; après connexion, retour automatique au trajet visé.
+
+Could have — « si j'ai le temps », après un MVP fini et poli
+------------------------------------------------------------
+
+- Autocomplétion des villes dans le formulaire de recherche.
+- Tri et pagination des résultats.
+- Mini-page d'administration pour créer un trajet (POST /api/trips).
+
+Won't have — hors périmètre assumé de la v1
+-------------------------------------------
+
+- Paiement réel (la réservation « confirmée » simule le paiement).
+- E-mails de confirmation et récupération de mot de passe.
+- Plan de salle / choix d'un siège précis (on réserve un nombre de places).
+- Avis et notes.
+- Multi-rôles (admin, conducteur…).
+- Cartes géographiques.
+- Temps réel (WebSockets).
+- Connexion Google/Facebook.
+
+Données de démonstration
+------------------------
+
+Les trajets seront créés par un script de peuplement rejouable
+(seed.py, ~30 trajets réalistes entre villes françaises) plutôt que par
+une page d'administration : moins coûteux, et des données de démo
+identiques à chaque exécution.

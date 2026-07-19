@@ -1,0 +1,70 @@
+Maquettes — les 5 écrans
+========================
+
+Maquettes filaires en noir et blanc : elles fixent la structure et le
+contenu de chaque écran, pas sa décoration. Pour chaque écran : la
+user story qu'il réalise et l'endpoint de l'API qui le nourrit.
+
+Barre de navigation commune
+---------------------------
+
+Présente sur les 5 écrans : nom du site à gauche ; « Rechercher »,
+« Mes réservations » et Connexion / Déconnexion à droite. L'état connecté
+change son affichage (nom du voyageur + bouton Déconnexion) — c'est le
+premier endroit où l'authentification est visible.
+
+Écran 1 — Recherche (accueil)
+-----------------------------
+
+Maquette : maquettes/ecran-1-recherche.svg
+
+- User stories : US1 (rechercher un trajet), US9 (prochains départs).
+- Endpoint : GET /api/trips.
+- Trois champs optionnels (départ, arrivée, date) + bouton Rechercher au
+  centre ; sous le formulaire, les prochains départs sans filtre pour que
+  la page ne soit jamais vide.
+
+Écran 2 — Résultats
+-------------------
+
+Maquette : maquettes/ecran-2-resultats.svg
+
+- User story : US2 (comparer les offres).
+- Endpoint : GET /api/trips?origin=&destination=&date=.
+- Carte trajet réutilisable : origine -> destination, date/heure, prix,
+  places restantes, bouton Réserver. Les critères restent modifiables en
+  haut. État vide prévu dès la maquette.
+
+Écran 3 — Détail du trajet
+--------------------------
+
+Maquette : maquettes/ecran-3-detail.svg
+
+- User stories : US3 (vérifier les informations), US6 (réserver).
+- Endpoints : GET /api/trips/<id> puis POST /api/bookings.
+- Le trajet en grand, sélecteur du nombre de places avec prix total
+  recalculé, bouton Réserver (redirige vers la connexion si déconnecté).
+  Une zone de message est prévue : c'est là que s'affichera le refus 409
+  « plus assez de places ».
+
+Écran 4 — Connexion / Inscription
+---------------------------------
+
+Maquette : maquettes/ecran-4-connexion.svg
+
+- User stories : US4 (créer un compte), US5 (se connecter), US10
+  (retour à la page demandée).
+- Endpoints : POST /api/auth/register · POST /api/auth/login.
+- Deux formulaires côte à côte ; les messages d'erreur s'affichent sous
+  les champs (409 email déjà utilisé, 401 identifiants invalides).
+
+Écran 5 — Mes réservations
+--------------------------
+
+Maquette : maquettes/ecran-5-mes-reservations.svg
+
+- User stories : US7 (consulter), US8 (annuler).
+- Endpoints : GET /api/bookings · DELETE /api/bookings/<id>.
+- Par réservation : trajet, date, nombre de places, prix total, statut
+  (confirmée / annulée). Bouton Annuler sur les confirmées, avec demande
+  de confirmation. État vide avec lien vers la recherche.
