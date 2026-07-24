@@ -1,0 +1,101 @@
+Schéma de la base de données
+============================
+
+PostgreSQL 18 — exactement 3 tables. Les tables sont créées par
+SQLAlchemy (db.create_all() dans seed.py) à partir des modèles
+déclarés dans backend/app/models.py.
+
+Diagramme entité-association (forme textuelle)
+----------------------------------------------
+
+    ┌──────────────────────┐          ┌──────────────────────┐
+    │        users         │          │        trips         │
+    ├──────────────────────┤          ├──────────────────────┤
+    │ id            SERIAL │◄──┐  ┌──►│ id            SERIAL │
+    │ email  VARCHAR(255)  │   │  │   │ origin  VARCHAR(100) │
+    │   UNIQUE NOT NULL    │   │  │   │ destination V.(100)  │
+    │ password_hash V.(255)│   │  │   │ departure_at TIMESTMP│
+    │ full_name    V.(100) │   │  │   │ arrival_at  TIMESTMP │
+    │ created_at  TIMESTMP │   │  │   │ price   NUMERIC(8,2) │
+    └──────────────────────┘   │  │   │ capacity     INTEGER │
+                               │  │   └──────────────────────┘
+                  1 voyageur   │  │   1 trajet
+                 N réservations│  │   N réservations
+                               │  │
+                      ┌────────┴──┴──────────┐
+                      │       bookings       │
+                      ├──────────────────────┤
+                      │ id            SERIAL │
+                      │ user_id  FK→users.id │
+                      │ trip_id  FK→trips.id │
+                      │ seats_booked INTEGER │
+                      │ status   VARCHAR(20) │
+                      │ created_at  TIMESTMP │
+                      └──────────────────────┘
+
+Détail des tables et contraintes
+--------------------------------
+
+users — les voyageurs (seul rôle de la plateforme)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Colonne         Type           Contraintes
+    -------------   ------------   -------------------------------
+    id              SERIAL         Clé primaire
+    email           VARCHAR(255)   UNIQUE, NOT NULL
+    password_hash   VARCHAR(255)   NOT NULL (hachage Werkzeug)
+    full_name       VARCHAR(100)   NOT NULL
+    created_at      TIMESTAMP      DEFAULT now()
+
+trips — les trajets proposés
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Colonne         Type           Contraintes
+    -------------   ------------   -------------------------------
+    id              SERIAL         Clé primaire
+    origin          VARCHAR(100)   NOT NULL
+    destination     VARCHAR(100)   NOT NULL
+    departure_at    TIMESTAMP      NOT NULL
+    arrival_at      TIMESTAMP      optionnelle
+    price           NUMERIC(8,2)   NOT NULL, CHECK (price >= 0)
+    capacity        INTEGER        NOT NULL, CHECK (capacity > 0)
+
+bookings — les réservations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Colonne         Type           Contraintes
+    -------------   ------------   ------------------------------------------
+    id              SERIAL         Clé primaire
+    user_id         INTEGER        FK -> users(id), NOT NULL
+    trip_id         INTEGER        FK -> trips(id), NOT NULL
+    seats_booked    INTEGER        NOT NULL, CHECK (seats_booked >= 1)
+    status          VARCHAR(20)    NOT NULL,
+                                   CHECK (status IN ('confirmed','cancelled'))
+    created_at      TIMESTAMP      DEFAULT now()
+
+Règle métier centrale
+---------------------
+
+  Places restantes d'un trajet = capacity − somme des seats_booked
+  des réservations « confirmed » de ce trajet.
+
+- La valeur n'est jamais stockée ni décrémentée : elle est recalculée
+  à chaque demande (implémentation unique dans Trip.remaining_seats_for(),
+  backend/app/models.py).
+- Annuler une réservation = passer son status à « cancelled », rien
+  d'autre. Les places redeviennent disponibles automatiquement puisque le
+  calcul les exclut.
+- À la création d'une réservation (endpoint prévu pour la semaine
+  prochaine), le trajet sera verrouillé (SELECT … FOR UPDATE) le temps
+  du calcul et de l'insertion, afin que deux réservations simultanées ne
+  puissent pas dépasser la capacité.
+
+Requête SQL de contrôle (utilisée pendant la vérification de la Partie 2) :
+
+    SELECT t.id, t.origin, t.destination, t.capacity,
+           t.capacity - COALESCE(SUM(b.seats_booked)
+               FILTER (WHERE b.status = 'confirmed'), 0) AS remaining_seats
+    FROM trips t
+    LEFT JOIN bookings b ON b.trip_id = t.id
+    WHERE t.id = 1
+    GROUP BY t.id;
