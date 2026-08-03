@@ -17,9 +17,11 @@ Avancement
 
 - API REST complète : les 9 endpoints (santé, authentification JWT,
   trajets, réservations) avec gestion d'erreurs cohérente en français.
-- Scénario de recette rejouable (docs/scenario-api.ps1) : inscription
-  -> connexion -> recherche -> réservation -> sur-réservation refusée
-  (409) -> annulation -> places redevenues disponibles.
+- Scénario de recette rejouable, en collection Thunder Client
+  (docs/collection-thunder-client.json) et en script équivalent
+  (docs/scenario-api.ps1) : inscription -> connexion -> recherche ->
+  réservation -> sur-réservation refusée (409) -> annulation -> places
+  redevenues disponibles.
 - Tranche verticale : une première page Angular affiche les trajets
   réels de PostgreSQL à travers l'API Flask (proxy /api en place).
 - À venir : les écrans complets de l'application (recherche, résultats,
@@ -144,6 +146,29 @@ Corps des requêtes et des réponses
 
 Les dates sont échangées au format ISO (heure locale naïve).
 
-Le scénario de recette complet est rejouable via :
+Scénario de recette — deux formats
+----------------------------------
+
+Le même parcours (inscription -> connexion -> recherche -> réservation ->
+sur-réservation refusée -> annulation -> places libérées) est fourni sous
+deux formes complémentaires :
+
+    docs/collection-thunder-client.json
+        Collection Thunder Client (le format demandé par la feuille de
+        route). À importer dans l'extension Thunder Client de VS Code,
+        avec docs/environnement-thunder-client.json. Le jeton JWT obtenu
+        à la connexion est capturé dans une variable d'environnement et
+        réutilisé automatiquement par les requêtes protégées : le
+        scénario se rejoue sans copier-coller.
+
+    docs/scenario-api.ps1
+        Équivalent scriptable du même scénario, exécuté en une seule
+        commande. C'est la forme utilisée pour la vérification
+        automatisée (chaque étape affiche la requête, le code HTTP et la
+        réponse) :
 
     powershell -ExecutionPolicy Bypass -File docs\scenario-api.ps1
+
+Prérequis dans les deux cas : l'API démarrée sur le port 5000 et la base
+fraîchement peuplée (python seed.py), afin que l'inscription renvoie 201
+et que le trajet 18 soit bien un trajet futur.
