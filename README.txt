@@ -8,28 +8,22 @@ consulte ou annule ses réservations.
 Pile technique
 --------------
 
-    Frontend .......... Angular 22 (à venir)
+    Frontend .......... Angular 22 (composants standalone, CSS artisanal)
     Backend ........... Python 3.13 · Flask 3.1
     Base de données ... PostgreSQL 18
 
 Avancement
 ----------
 
-- Schéma de la base finalisé et validé : 3 tables (users, trips,
-  bookings) avec contraintes — voir docs/schema-base-de-donnees.txt.
-- Modèles SQLAlchemy branchés sur PostgreSQL et script seed.py
-  rejouable (~30 trajets réalistes entre villes françaises).
-- Premiers endpoints : GET /api/health, GET /api/trips (filtres
-  origine / destination / date) et GET /api/trips/<id>.
-- À venir : authentification JWT et endpoints de réservation.
-
-Règle métier centrale
----------------------
-
-Les places restantes d'un trajet ne sont jamais stockées : elles sont
-recalculées à chaque demande selon la formule
-« capacité − somme des places des réservations "confirmed" ». Annuler une
-réservation reviendra simplement à passer son statut à « cancelled ».
+- API REST complète : les 9 endpoints (santé, authentification JWT,
+  trajets, réservations) avec gestion d'erreurs cohérente en français.
+- Scénario de recette rejouable (docs/scenario-api.ps1) : inscription
+  -> connexion -> recherche -> réservation -> sur-réservation refusée
+  (409) -> annulation -> places redevenues disponibles.
+- Tranche verticale : une première page Angular affiche les trajets
+  réels de PostgreSQL à travers l'API Flask (proxy /api en place).
+- À venir : les écrans complets de l'application (recherche, résultats,
+  détail, connexion, mes réservations).
 
 Installation
 ------------
@@ -38,6 +32,8 @@ Prérequis
 ~~~~~~~~~
 
 - Git
+- Node.js 24 LTS (avec npm)
+- Angular CLI 22 : npm install -g @angular/cli
 - Python 3.12 ou plus récent
 - PostgreSQL 18
 
@@ -65,23 +61,89 @@ Base de données (PostgreSQL 18)
     cd backend
     venv\Scripts\python.exe seed.py
 
-Le script seed.py est rejouable à volonté : il crée les tables si
-nécessaire, vide les données puis réinsère le même jeu (30 trajets, dates
-passées et futures, deux comptes de démonstration pour la suite du
-projet).
+Le script seed.py est rejouable à volonté (30 trajets entre villes
+françaises, deux comptes de démonstration — mot de passe
+motdepasse123 : sophie.martin@example.fr, lucas.bernard@example.fr).
 
-Endpoints disponibles
----------------------
+Règle métier centrale : les places restantes d'un trajet ne sont jamais
+stockées ; elles sont recalculées à chaque demande selon la formule
+« capacité − somme des places des réservations "confirmed" »
+(voir docs/schema-base-de-donnees.txt).
 
-    GET /api/health
+Frontend (tranche verticale)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    cd frontend
+
+    npm install
+
+    ng serve --port 4200
+
+La page servie sur http://localhost:4200 affiche les prochains départs
+réels de la base, à travers le proxy /api -> Flask (port 5000).
+
+API REST
+--------
+
+Toutes les réponses sont en JSON. En cas d'erreur, le corps est toujours
+{"error": "message en français"} avec le code HTTP approprié :
+400 (champ manquant ou invalide), 401 (identifiants ou jeton invalides),
+403 (ressource d'un autre voyageur), 404 (introuvable), 409 (conflit
+métier : email déjà pris, places insuffisantes).
+
+    GET /api/health                                          Auth : aucune
         État de santé de l'API
-    GET /api/trips
+    POST /api/auth/register                                  Auth : aucune
+        Inscription (409 si email déjà utilisé, mot de passe haché)
+    POST /api/auth/login                                     Auth : aucune
+        Connexion : renvoie un jeton JWT (24 h) et le profil
+    GET /api/auth/me                                         Auth : JWT
+        Profil du voyageur identifié par le jeton
+    GET /api/trips                                           Auth : aucune
         Trajets futurs triés par départ, filtres
         ?origin=&destination=&date=, places restantes incluses
-    GET /api/trips/<id>
+    GET /api/trips/<id>                                      Auth : aucune
         Détail d'un trajet (404 si inconnu)
+    POST /api/bookings                                       Auth : JWT
+        Réserver {trip_id, seats} — recalcul côté serveur, 409 si places
+        insuffisantes
+    GET /api/bookings                                        Auth : JWT
+        Les réservations du voyageur courant, avec les infos du trajet
+    DELETE /api/bookings/<id>                                Auth : JWT
+        Annuler (statut -> cancelled), 403 si autre voyageur, 404 si
+        inconnue
 
-Vérification rapide :
+Corps des requêtes et des réponses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    curl http://localhost:5000/api/health
-    curl "http://localhost:5000/api/trips?origin=Paris&destination=Lyon"
+    POST /api/auth/register   -> { "email", "password", "full_name" }
+      201 -> { "user": { id, email, full_name, created_at } }
+
+    POST /api/auth/login      -> { "email", "password" }
+      200 -> { "token": "…jwt…", "user": { … } }
+
+    GET  /api/auth/me         (en-tête Authorization: Bearer <jeton>)
+      200 -> { "user": { … } }
+
+    GET  /api/trips[?origin=&destination=&date=AAAA-MM-JJ]
+      200 -> { "trips": [ { id, origin, destination, departure_at, arrival_at,
+                            price, capacity, remaining_seats } ] }
+
+    GET  /api/trips/<id>
+      200 -> { "trip": { … } }
+
+    POST /api/bookings        -> { "trip_id": 18, "seats": 2 }   (JWT)
+      201 -> { "booking": { id, user_id, trip_id, seats_booked, status,
+                            created_at, trip: { … } } }
+
+    GET  /api/bookings        (JWT)
+      200 -> { "bookings": [ { …, trip: { … } } ] }
+
+    DELETE /api/bookings/<id> (JWT)
+      200 -> { "message": "Réservation annulée.", "booking": { … } }
+
+Les dates sont échangées au format ISO (heure locale naïve).
+
+Le scénario de recette complet est rejouable via :
+
+    powershell -ExecutionPolicy Bypass -File docs\scenario-api.ps1

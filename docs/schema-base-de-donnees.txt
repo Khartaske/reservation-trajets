@@ -85,10 +85,9 @@ Règle métier centrale
 - Annuler une réservation = passer son status à « cancelled », rien
   d'autre. Les places redeviennent disponibles automatiquement puisque le
   calcul les exclut.
-- À la création d'une réservation (endpoint prévu pour la semaine
-  prochaine), le trajet sera verrouillé (SELECT … FOR UPDATE) le temps
-  du calcul et de l'insertion, afin que deux réservations simultanées ne
-  puissent pas dépasser la capacité.
+- À la création d'une réservation, le trajet est verrouillé
+  (SELECT … FOR UPDATE) le temps du calcul et de l'insertion : deux
+  réservations simultanées ne peuvent pas dépasser la capacité.
 
 Requête SQL de contrôle (utilisée pendant la vérification de la Partie 2) :
 

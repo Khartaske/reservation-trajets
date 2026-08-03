@@ -1,0 +1,32 @@
+<header class="navbar">
+  <span class="navbar-brand">RésaTrajets</span>
+</header>
+
+<main class="page">
+  <h1>Prochains départs</h1>
+
+  @if (loading()) {
+    <p class="info">Chargement des trajets…</p>
+  } @else if (error()) {
+    <p class="error-message">{{ error() }}</p>
+  } @else if (trips().length === 0) {
+    <p class="info">Aucun trajet à venir pour le moment.</p>
+  } @else {
+    <ul class="trip-list">
+      @for (trip of trips(); track trip.id) {
+        <li class="trip-item">
+          <div class="trip-route">
+            <span class="trip-city">{{ trip.origin }}</span>
+            <span class="trip-arrow" aria-hidden="true">→</span>
+            <span class="trip-city">{{ trip.destination }}</span>
+          </div>
+          <p class="trip-date">Départ : {{ trip.departure_at | date: "EEEE d MMMM y 'à' HH:mm" }}</p>
+          <p class="trip-meta">
+            <span class="trip-price">{{ trip.price | currency: 'EUR' }}</span>
+            <span class="trip-seats">{{ trip.remaining_seats }} place(s) restante(s)</span>
+          </p>
+        </li>
+      }
+    </ul>
+  }
+</main>

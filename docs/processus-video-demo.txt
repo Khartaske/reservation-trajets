@@ -1,0 +1,50 @@
+Processus — vidéo de démonstration hebdomadaire
+===============================================
+
+Procédure suivie pour chaque point d'avancement envoyé au chef de projet,
+afin que les vidéos des semaines suivantes soient produites de la même
+façon.
+
+Préparation
+-----------
+
+1. Repeupler la base juste avant l'enregistrement, pour des données
+   propres et déterministes :
+
+       cd backend
+       venv\Scripts\python.exe seed.py
+
+2. Ouvrir trois terminaux dédiés : API Flask, serveur Angular, scénario.
+   Police 16 à 20 pt, notifications du système coupées, aucune fenêtre
+   personnelle à l'écran.
+3. Ne jamais afficher le fichier .env ni aucune valeur secrète à l'écran.
+
+Déroulé (3 à 4 minutes)
+-----------------------
+
+1. Démarrer l'API : flask run --debug --port 5000 (terminal 1).
+2. Démarrer le frontend : ng serve --port 4200 (terminal 2).
+3. Dérouler le scénario commenté de l'API (terminal 3) :
+
+       powershell -ExecutionPolicy Bypass -File docs\scenario-api.ps1
+
+   et commenter les étapes clés (codes HTTP, messages en français,
+   places restantes recalculées).
+4. Montrer la page Angular sur http://localhost:4200.
+5. Preuve « base en direct » : modifier une donnée directement dans
+   PostgreSQL (UPDATE en psql), rafraîchir la page, constater le
+   changement.
+6. Conclure sur ce qui est prévu la semaine suivante.
+
+Après l'enregistrement
+----------------------
+
+- Rejouer seed.py pour restaurer les données de démonstration.
+- Taille du fichier : au-delà d'environ 25 Mo, la vidéo n'est PAS
+  commitée dans Git (les binaires alourdissent le dépôt définitivement
+  et GitHub refuse tout fichier de plus de 100 Mo). Elle est envoyée au
+  chef de projet par un lien de partage ; le motif *.mp4 figure dans le
+  .gitignore du dépôt.
+- En dessous de cette taille, la vidéo peut être placée dans docs/ avec
+  un nom explicite (ex. demo-semaine-N.mp4) et référencée depuis le
+  README.
