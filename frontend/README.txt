@@ -1,65 +1,33 @@
-Frontend
-========
+Frontend Angular
+================
 
-This project was generated using Angular CLI (https://github.com/angular/angular-cli)
-version 22.0.6.
+Ce dossier contient l'application Angular 22 du projet « Réservation de
+trajets ». Il a été généré avec Angular CLI (version 22.0.6) puis adapté
+aux besoins du projet : composants standalone, CSS écrit à la main,
+aucune bibliothèque d'interface externe.
 
-Development server
-------------------
+Installation et lancement
+-------------------------
 
-To start a local development server, run:
+Les instructions complètes (prérequis, base de données, API Flask et
+frontend) se trouvent dans le README à la racine du dépôt. En résumé,
+depuis ce dossier :
 
-    ng serve
+    npm install
+    ng serve --port 4200
 
-Once the server is running, open your browser and navigate to
-http://localhost:4200/. The application will automatically reload whenever
-you modify any of the source files.
+L'application est alors servie sur http://localhost:4200. Les appels vers
+/api/... sont redirigés vers l'API Flask (port 5000) par proxy.conf.json :
+aucun problème de CORS en développement.
 
-Code scaffolding
-----------------
-
-Angular CLI includes powerful code scaffolding tools. To generate a new
-component, run:
-
-    ng generate component component-name
-
-For a complete list of available schematics (such as components,
-directives, or pipes), run:
-
-    ng generate --help
-
-Building
---------
-
-To build the project run:
+Compilation de production
+-------------------------
 
     ng build
 
-This will compile your project and store the build artifacts in the dist/
-directory. By default, the production build optimizes your application for
-performance and speed.
+Le résultat est produit dans le dossier dist/ ; c'est lui qui est publié
+lors du déploiement.
 
-Running unit tests
-------------------
-
-To execute unit tests with the Vitest (https://vitest.dev/) test runner,
-use the following command:
-
-    ng test
-
-Running end-to-end tests
-------------------------
-
-For end-to-end (e2e) testing, run:
-
-    ng e2e
-
-Angular CLI does not come with an end-to-end testing framework by default.
-You can choose one that suits your needs.
-
-Additional Resources
---------------------
-
-For more information on using the Angular CLI, including detailed command
-references, visit the Angular CLI Overview and Command Reference page
-(https://angular.dev/tools/cli).
+Note : le projet n'utilise pas de framework de tests automatisés (choix
+assumé, inscrit dans les limites du projet). La validation de l'API passe
+par les scénarios de recette du dossier docs/, à la racine du dépôt.
